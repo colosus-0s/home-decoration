@@ -2,18 +2,21 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Container, Button } from '../common';
 import { siteConfig } from '../../data/siteConfig';
-import { HERO_POSTER_IMAGE } from '../../utils/assets';
+import { HERO_POSTER_IMAGE, HERO_MOBILE_IMAGE } from '../../utils/assets';
 
 export const HeroSection: React.FC = () => {
   return (
     <section className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-bg-primary pt-24 pb-12">
-      {/* Background Media Architecture (Full-screen interior visual with video fallback support) */}
+      {/* Background Media Architecture (Full-screen interior visual with dedicated mobile crop) */}
       <div className="absolute inset-0 z-0">
-        <img
-          src={HERO_POSTER_IMAGE}
-          alt="Cinematic interior transformation environment with warm lighting"
-          className="w-full h-full object-cover opacity-60 scale-105 transition-transform duration-1000 ease-editorial"
-        />
+        <picture>
+          <source media="(max-width: 639px)" srcSet={HERO_MOBILE_IMAGE} />
+          <img
+            src={HERO_POSTER_IMAGE}
+            alt="Cinematic interior transformation environment with warm architectural lighting"
+            className="w-full h-full object-cover opacity-60 scale-105 transition-transform duration-1000 ease-editorial"
+          />
+        </picture>
         {/* Editorial Vignette and Shadow Gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-bg-primary via-bg-primary/40 to-bg-primary/60" />
         <div className="absolute inset-0 bg-gradient-to-r from-bg-primary/80 via-transparent to-bg-primary/40" />
