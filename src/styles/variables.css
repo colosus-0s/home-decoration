@@ -1,0 +1,44 @@
+/* Architectural Design System Tokens - Phase 2 Visual Foundations */
+
+:root {
+  /* 1. Color Palette Tokens */
+  --bg-primary: #0D0D0E;       /* Deep Charcoal / Near Black */
+  --bg-surface: #1A1A1D;       /* Dark Elevated Surface */
+  --bg-surface-light: #242428; /* Lightened Surface Elevation */
+  --bg-border: #2A2A2E;        /* Architectural Border & Hairline Separator */
+
+  --text-primary: #E6E6E2;     /* Warm Ivory - Primary Text */
+  --text-secondary: #9A9A95;   /* Muted Grey - Subtitles & Captions */
+  --text-dark: #0D0D0E;        /* Dark Text - Sand Accent Backgrounds */
+
+  --accent-sand: #CBB197;      /* Warm Sand / Bronze - Primary Accent */
+  --accent-sand-hover: #D9C3AD;/* Lighter Sand - Hover State */
+  --accent-sage: #7A953A;      /* Muted Organic Sage Green - Secondary Accent */
+
+  /* 2. Typography System Tokens */
+  --font-serif: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'DM Sans', 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* 3. Spacing Tokens */
+  --space-section-desktop: 9rem;     /* 144px */
+  --space-section-mobile: 5rem;      /* 80px */
+  --space-container-padding-desktop: 4rem; /* 64px */
+  --space-container-padding-mobile: 1.5rem; /* 24px */
+  
+  --space-gap-loose: 4rem;           /* 64px */
+  --space-gap-comfortable: 2.5rem;   /* 40px */
+  --space-gap-compact: 1.5rem;       /* 24px */
+  --space-gap-tight: 0.75rem;        /* 12px */
+
+  /* 4. Layout Container Tokens */
+  --container-max-width: 1440px;
+
+  /* 5. Motion & Easing Tokens */
+  --ease-editorial: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.25, 1, 0.5, 1);
+  
+  --duration-fast: 150ms;
+  --duration-normal: 350ms;
+  --duration-slow: 700ms;
+  --duration-cinematic: 1200ms;
+}
