@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 export interface EditorialImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
@@ -23,6 +23,14 @@ export const EditorialImage: React.FC<EditorialImageProps> = ({
   ...rest
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    // If image is already complete (from cache or fast load), set loaded immediately
+    if (imgRef.current && imgRef.current.complete) {
+      setIsLoaded(true);
+    }
+  }, [src]);
 
   const getObjectFitClass = () => {
     switch (objectFit) {
@@ -41,21 +49,23 @@ export const EditorialImage: React.FC<EditorialImageProps> = ({
     >
       {/* Subtle skeleton shimmer during asset loading */}
       <div
-        className={`absolute inset-0 bg-bg-surface-light transition-opacity duration-700 ${
+        className={`absolute inset-0 bg-bg-surface-light transition-opacity duration-500 ${
           isLoaded ? 'opacity-0 pointer-events-none' : 'opacity-100'
         }`}
         aria-hidden="true"
       />
 
       <img
+        ref={imgRef}
         src={src}
         alt={alt}
         loading={priority ? 'eager' : 'lazy'}
         decoding="async"
         onLoad={() => setIsLoaded(true)}
+        onError={() => setIsLoaded(true)}
         className={`w-full h-full ${getObjectFitClass()} transition-all duration-700 ease-editorial ${
           hoverScale ? 'hover:scale-105' : ''
-        } ${isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-102'} ${imageClassName}`.trim()}
+        } ${isLoaded ? 'opacity-100 scale-100' : 'opacity-100 scale-100'} ${imageClassName}`.trim()}
         {...rest}
       />
     </div>
