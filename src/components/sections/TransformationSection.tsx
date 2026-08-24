@@ -35,9 +35,8 @@ export const TransformationSection: React.FC = () => {
     handleUserSelect((activeStageIndex - 1 + transformationStages.length) % transformationStages.length);
   }, [activeStageIndex, handleUserSelect]);
 
-  // Cinematic Autoplay Loop
+  // Cinematic Autoplay Loop (Advances activeStageIndex smoothly)
   useEffect(() => {
-    // Check prefers-reduced-motion preference
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion || !isInView || isPaused) return;
 
@@ -74,7 +73,7 @@ export const TransformationSection: React.FC = () => {
           />
         </div>
 
-        {/* 6-Stage Progress Indicator Bar */}
+        {/* 6-Stage Progress Indicator Tabs (Active Stage is Single Source of Truth) */}
         <div className="grid grid-cols-6 gap-2 mb-10 border-b border-bg-border/60 pb-6 overflow-x-auto scrollbar-none">
           {transformationStages.map((stage, idx) => {
             const isActive = idx === activeStageIndex;
@@ -86,7 +85,7 @@ export const TransformationSection: React.FC = () => {
                 aria-label={`Select Layer ${stage.number}: ${stage.title}`}
                 className={`flex flex-col items-start p-3 transition-all duration-300 text-left border-l-2 relative ${
                   isActive
-                    ? 'border-accent-sand bg-bg-primary/50 text-text-primary'
+                    ? 'border-accent-sand bg-bg-primary/60 text-text-primary'
                     : 'border-bg-border text-text-secondary/60 hover:text-text-primary hover:border-bg-border/80'
                 }`}
               >
@@ -94,15 +93,17 @@ export const TransformationSection: React.FC = () => {
                   <span className={`font-mono text-xs tracking-widest ${isActive ? 'text-accent-sand font-bold' : ''}`}>
                     {stage.number}
                   </span>
-                  {isActive && !isPaused && isInView && (
+
+                  {/* Clean State Indicator Dot — Moves once with layoutId, zero oscillation */}
+                  {isActive && (
                     <motion.span
-                      layoutId="activeGlow"
+                      layoutId="activeStageDot"
+                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                       className="w-1.5 h-1.5 rounded-full bg-accent-sand"
-                      animate={{ opacity: [0.4, 1, 0.4] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
                     />
                   )}
                 </div>
+
                 <span className="font-sans text-[11px] tracking-wider uppercase font-medium mt-1 truncate w-full">
                   {stage.title.replace('THE ', '')}
                 </span>
@@ -111,7 +112,7 @@ export const TransformationSection: React.FC = () => {
           })}
         </div>
 
-        {/* Transformation Showcase Container (Single Room Evolving) */}
+        {/* Transformation Showcase Container */}
         <div
           className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center bg-bg-primary border-architectural p-6 md:p-10 relative"
           onMouseEnter={() => setIsPaused(true)}
@@ -126,10 +127,10 @@ export const TransformationSection: React.FC = () => {
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeStage.id}
-                initial={{ opacity: 0, scale: 1.02 }}
+                initial={{ opacity: 0, scale: 1.01 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.98 }}
-                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                exit={{ opacity: 0, scale: 0.99 }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
                 className="w-full h-full"
               >
                 <EditorialImage
@@ -155,10 +156,10 @@ export const TransformationSection: React.FC = () => {
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeStage.id}
-                initial={{ opacity: 0, y: 15 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                 className="flex flex-col items-start"
               >
                 <span className="font-eyebrow text-accent-sand mb-2">
