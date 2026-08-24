@@ -21,10 +21,12 @@ export const TransformationSection: React.FC = () => {
       clearTimeout(userInteractionTimeoutRef.current);
     }
 
-    // Resume autoplay after 8 seconds of inactivity
-    userInteractionTimeoutRef.current = setTimeout(() => {
-      setIsPaused(false);
-    }, 8000);
+    // Resume autoplay after 6 seconds of inactivity if not at final stage
+    if (index < transformationStages.length - 1) {
+      userInteractionTimeoutRef.current = setTimeout(() => {
+        setIsPaused(false);
+      }, 6000);
+    }
   }, []);
 
   const handleNext = useCallback(() => {
@@ -35,14 +37,22 @@ export const TransformationSection: React.FC = () => {
     handleUserSelect((activeStageIndex - 1 + transformationStages.length) % transformationStages.length);
   }, [activeStageIndex, handleUserSelect]);
 
-  // Cinematic Autoplay Loop (Advances activeStageIndex smoothly)
+  // Cinematic Autoplay Loop (Advances activeStageIndex smoothly until Stage 06)
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion || !isInView || isPaused) return;
 
     const interval = setInterval(() => {
-      setActiveStageIndex((prev) => (prev + 1) % transformationStages.length);
-    }, 4500);
+      setActiveStageIndex((prev) => {
+        if (prev < transformationStages.length - 1) {
+          return prev + 1;
+        } else {
+          // Reached Stage 06: hold on completed space (Option B)
+          setIsPaused(true);
+          return prev;
+        }
+      });
+    }, 3500);
 
     return () => clearInterval(interval);
   }, [isInView, isPaused]);
@@ -73,43 +83,45 @@ export const TransformationSection: React.FC = () => {
           />
         </div>
 
-        {/* 6-Stage Progress Indicator Tabs (Active Stage is Single Source of Truth) */}
-        <div className="grid grid-cols-6 gap-2 mb-10 border-b border-bg-border/60 pb-6 overflow-x-auto scrollbar-none">
-          {transformationStages.map((stage, idx) => {
-            const isActive = idx === activeStageIndex;
-            return (
-              <button
-                key={stage.id}
-                type="button"
-                onClick={() => handleUserSelect(idx)}
-                aria-label={`Select Layer ${stage.number}: ${stage.title}`}
-                className={`flex flex-col items-start p-3 transition-all duration-300 text-left border-l-2 relative ${
-                  isActive
-                    ? 'border-accent-sand bg-bg-primary/60 text-text-primary'
-                    : 'border-bg-border text-text-secondary/60 hover:text-text-primary hover:border-bg-border/80'
-                }`}
-              >
-                <div className="flex items-center justify-between w-full">
-                  <span className={`font-mono text-xs tracking-widest ${isActive ? 'text-accent-sand font-bold' : ''}`}>
-                    {stage.number}
+        {/* 6-Stage Progress Indicator Tabs (Deterministic Active Stage is Single Source of Truth) */}
+        <div className="relative mb-10 pb-6 border-b border-bg-border/60">
+          <div className="grid grid-cols-6 gap-2 overflow-x-auto scrollbar-none">
+            {transformationStages.map((stage, idx) => {
+              const isActive = idx === activeStageIndex;
+              return (
+                <button
+                  key={stage.id}
+                  type="button"
+                  onClick={() => handleUserSelect(idx)}
+                  aria-label={`Select Layer ${stage.number}: ${stage.title}`}
+                  className={`flex flex-col items-start p-3 transition-all duration-300 text-left border-l-2 relative ${
+                    isActive
+                      ? 'border-accent-sand bg-bg-primary/60 text-text-primary'
+                      : 'border-bg-border text-text-secondary/60 hover:text-text-primary hover:border-bg-border/80'
+                  }`}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className={`font-mono text-xs tracking-widest ${isActive ? 'text-accent-sand font-bold' : ''}`}>
+                      {stage.number}
+                    </span>
+
+                    {/* Deterministic Indicator Dot — Moves once with layoutId, zero oscillation */}
+                    {isActive && (
+                      <motion.span
+                        layoutId="activeStageDot"
+                        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                        className="w-1.5 h-1.5 rounded-full bg-accent-sand"
+                      />
+                    )}
+                  </div>
+
+                  <span className="font-sans text-[11px] tracking-wider uppercase font-medium mt-1 truncate w-full">
+                    {stage.title.replace('THE ', '')}
                   </span>
-
-                  {/* Clean State Indicator Dot — Moves once with layoutId, zero oscillation */}
-                  {isActive && (
-                    <motion.span
-                      layoutId="activeStageDot"
-                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                      className="w-1.5 h-1.5 rounded-full bg-accent-sand"
-                    />
-                  )}
-                </div>
-
-                <span className="font-sans text-[11px] tracking-wider uppercase font-medium mt-1 truncate w-full">
-                  {stage.title.replace('THE ', '')}
-                </span>
-              </button>
-            );
-          })}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Transformation Showcase Container */}
@@ -117,7 +129,7 @@ export const TransformationSection: React.FC = () => {
           className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center bg-bg-primary border-architectural p-6 md:p-10 relative"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => {
-            if (!userInteractionTimeoutRef.current) {
+            if (!userInteractionTimeoutRef.current && activeStageIndex < transformationStages.length - 1) {
               setIsPaused(false);
             }
           }}
@@ -127,9 +139,9 @@ export const TransformationSection: React.FC = () => {
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeStage.id}
-                initial={{ opacity: 0, scale: 1.01 }}
+                initial={{ opacity: 0, scale: 1.015 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.99 }}
+                exit={{ opacity: 0, scale: 0.985 }}
                 transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
                 className="w-full h-full"
               >
@@ -145,7 +157,7 @@ export const TransformationSection: React.FC = () => {
             {/* Active Stage Overlay Badge */}
             <div className="absolute top-4 left-4 px-3 py-1.5 bg-bg-primary/90 backdrop-blur-md border border-bg-border text-xs tracking-widest uppercase font-mono text-accent-sand flex items-center gap-2">
               <span>Layer {activeStage.number} / 06</span>
-              {!isPaused && isInView && (
+              {!isPaused && isInView && activeStageIndex < transformationStages.length - 1 && (
                 <span className="text-[10px] text-text-secondary opacity-70 lowercase font-sans">(auto)</span>
               )}
             </div>
